@@ -1,0 +1,6 @@
+{
+  "name": "一条高校バドミントン部 カギ当番ルーレット",
+  "description": "メンバーの名前を入力して、部室や体育館の鍵返却当番をランダムに決定するルーレットアプリ。",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
