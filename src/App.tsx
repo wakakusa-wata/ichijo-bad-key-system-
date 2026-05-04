@@ -115,117 +115,138 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="max-w-xl mx-auto w-full px-5 pt-6 flex flex-col gap-8">
-        
-        {/* Key Selector */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-              <Key className="w-4 h-4 text-indigo-500" /> 返却する鍵
-            </h2>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {(['clubhouse', 'gym', 'other'] as KeyType[]).map((type) => (
-              <button
-                key={type}
-                onClick={() => setSelectedKey(type)}
-                className={`py-4 rounded-2xl border-2 font-bold transition-all relative overflow-hidden ${
-                  selectedKey === type 
-                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-100 scale-[1.02]' 
-                    : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
-                }`}
-              >
-                {keyLabels[type]}
-                {selectedKey === type && (
-                  <motion.div 
-                    layoutId="activeTab"
-                    className="absolute inset-0 bg-white/10"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Roulette Stage */}
-        <section className="flex justify-center py-2">
-          <Roulette 
-            members={members} 
-            onResult={handleResult} 
-            isSpinning={isSpinning} 
-            setIsSpinning={setIsSpinning} 
-          />
-        </section>
-
-        {/* Member Management */}
-        <section className="bg-white rounded-[2.5rem] p-7 shadow-sm border border-slate-200/60">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-black text-xl flex items-center gap-2">
-              <ClipboardList className="w-6 h-6 text-indigo-600" />
-              メンバー <span className="text-sm text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded-lg ml-1">{members.length}人</span>
-            </h3>
-            {members.length > 0 && (
-              <button 
-                onClick={() => { if(confirm('全員削除しますか？')) setMembers([]); }}
-                className="text-xs font-bold text-slate-300 hover:text-rose-500 transition-colors"
-              >
-                リセット
-              </button>
-            )}
-          </div>
-
-          <form onSubmit={addMember} className="flex gap-2 mb-6">
-            <input 
-              type="text" 
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="名前を入力..." 
-              className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold placeholder:text-slate-300"
-            />
-            <button 
-              type="submit"
-              className="bg-indigo-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 active:scale-90"
-            >
-              <Plus className="w-7 h-7" />
-            </button>
-          </form>
-
-          <div className="flex flex-wrap gap-2">
-            <AnimatePresence>
-              {members.map((m) => (
-                <motion.div 
-                  key={m.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="bg-slate-50 border border-slate-100 rounded-2xl pl-4 pr-2 py-2 flex items-center gap-1 group transition-all hover:bg-white hover:border-indigo-100"
-                >
-                  <span className="font-black text-slate-600 text-sm tracking-tight">{m.name}</span>
-                  <button 
-                    onClick={() => removeMember(m.id)}
-                    className="p-2 text-slate-300 hover:text-rose-500 transition-colors"
+      <main className="max-w-5xl mx-auto w-full px-5 pt-6 lg:pt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          
+          {/* Settings & Members (Left on Desktop) */}
+          <div className="lg:col-span-5 flex flex-col gap-8 order-2 lg:order-1">
+            {/* Key Selector */}
+            <section className="bg-white rounded-[2.5rem] p-7 shadow-sm border border-slate-200/60">
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <Key className="w-4 h-4 text-indigo-500" /> 返却する鍵を選択
+              </h2>
+              <div className="grid grid-cols-3 gap-3">
+                {(['clubhouse', 'gym', 'other'] as KeyType[]).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setSelectedKey(type)}
+                    className={`py-4 rounded-2xl border-2 font-bold transition-all relative overflow-hidden ${
+                      selectedKey === type 
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-100 scale-[1.02]' 
+                        : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+                    }`}
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="relative z-10">{keyLabels[type]}</span>
+                    {selectedKey === type && (
+                      <motion.div 
+                        layoutId="activeTab"
+                        className="absolute inset-0 bg-white/10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
                   </button>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-          {members.length === 0 && (
-            <div className="text-center py-10 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
-              <p className="text-slate-400 text-sm font-bold">メンバーが登録されていません</p>
-            </div>
-          )}
-        </section>
+                ))}
+              </div>
+            </section>
 
-        {/* Footer Info */}
-        <p className="text-center text-slate-400 text-xs font-medium leading-relaxed opacity-60">
-          抽選は公平に行われます。<br/>
-          当たった人は責任を持って鍵を返却しましょう。
-        </p>
+            {/* Member Management */}
+            <section className="bg-white rounded-[2.5rem] p-7 shadow-sm border border-slate-200/60 flex flex-col min-h-[400px]">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-black text-xl flex items-center gap-2">
+                  <ClipboardList className="w-6 h-6 text-indigo-600" />
+                  メンバー <span className="text-sm text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded-lg ml-1">{members.length}人</span>
+                </h3>
+                {members.length > 0 && (
+                  <button 
+                    onClick={() => { if(confirm('全員削除しますか？')) setMembers([]); }}
+                    className="text-xs font-bold text-slate-300 hover:text-rose-500 transition-colors"
+                  >
+                    一括削除
+                  </button>
+                )}
+              </div>
+
+              <form onSubmit={addMember} className="flex gap-2 mb-6">
+                <input 
+                  type="text" 
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="追加する名前..." 
+                  className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold placeholder:text-slate-300"
+                />
+                <button 
+                  type="submit"
+                  className="bg-indigo-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-indigo-500 transition-all shadow-lg active:scale-90"
+                >
+                  <Plus className="w-7 h-7" />
+                </button>
+              </form>
+
+              <div className="flex-1 overflow-y-auto max-h-[350px] pr-1 custom-scrollbar">
+                <div className="flex flex-wrap gap-2">
+                  <AnimatePresence>
+                    {members.map((m) => (
+                      <motion.div 
+                        key={m.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="bg-slate-50 border border-slate-100 rounded-2xl pl-4 pr-2 py-2 flex items-center gap-1 group transition-all hover:bg-white hover:border-indigo-100"
+                      >
+                        <span className="font-black text-slate-600 text-sm tracking-tight">{m.name}</span>
+                        <button 
+                          onClick={() => removeMember(m.id)}
+                          className="p-2 text-slate-300 hover:text-rose-500 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+                {members.length === 0 && (
+                  <div className="text-center py-10 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                    <p className="text-slate-400 text-sm font-bold italic">メンバーを追加してください</p>
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
+
+          {/* Roulette Stage (Right on Desktop) */}
+          <div className="lg:col-span-7 flex flex-col items-center justify-center order-1 lg:order-2 py-4 lg:py-0">
+            <Roulette 
+              members={members} 
+              onResult={handleResult} 
+              isSpinning={isSpinning} 
+              setIsSpinning={setIsSpinning} 
+            />
+            
+            <div className="mt-12 hidden lg:block text-center space-y-2">
+               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest opacity-60">
+                 Ichijo Badminton Club - Key Management Tool
+               </p>
+               <div className="flex justify-center gap-6">
+                 <div className="flex items-center gap-2 text-slate-300">
+                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                   <span className="text-[10px] font-black">シャトル整理</span>
+                 </div>
+                 <div className="flex items-center gap-2 text-slate-300">
+                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                   <span className="text-[10px] font-black">忘れ物確認</span>
+                 </div>
+                 <div className="flex items-center gap-2 text-slate-300">
+                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                   <span className="text-[10px] font-black">完全消灯</span>
+                 </div>
+               </div>
+            </div>
+          </div>
+
+        </div>
       </main>
+
 
       {/* Result Modal - High Visibility */}
       <AnimatePresence>
